@@ -17,20 +17,17 @@
  * limitations under the License.
  * #L%
  */
-package org.broadleafcommerce.vendor.authorizenet.service.payment;
-
-
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
-import net.authorize.sim.Result;
+package org.broadleafcommerce.vendor.authorizenet.service.payment.type;
 
 /**
- * @author elbertbautista
+ * @author Chad Harchar (charchar)
  */
-public interface AuthorizeNetCheckoutService {
+public class MessageConstants {
 
-    public String buildRelayResponse(String receiptUrl, Result result);
-
-    public String createTamperProofSeal(String string, String string2) throws NoSuchAlgorithmException, InvalidKeyException;
+    public static final String BLC_CID = "blc_cid";
+    public static final String BLC_OID = "blc_oid";
+    public static final String BLC_TPS = "blc_tps";
+    public static final String AUTHORIZENET_SERVER_URL = "authorizenet_server_url";
+    public static final String REQ_AMOUNT = "req_amount";
+    public static final String TRANSACTION_TIME = "transaction_time";
 }

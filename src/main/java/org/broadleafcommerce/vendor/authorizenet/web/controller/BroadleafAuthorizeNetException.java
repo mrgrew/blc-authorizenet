@@ -17,20 +17,13 @@
  * limitations under the License.
  * #L%
  */
-package org.broadleafcommerce.vendor.authorizenet.service.payment;
+package org.broadleafcommerce.vendor.authorizenet.web.controller;
 
+public class BroadleafAuthorizeNetException extends Exception{
+	
+	private static final long serialVersionUID = 1L;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
-import net.authorize.sim.Result;
-
-/**
- * @author elbertbautista
- */
-public interface AuthorizeNetCheckoutService {
-
-    public String buildRelayResponse(String receiptUrl, Result result);
-
-    public String createTamperProofSeal(String string, String string2) throws NoSuchAlgorithmException, InvalidKeyException;
+	public BroadleafAuthorizeNetException (String message) {
+		super(message);
+	}
 }
