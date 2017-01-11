@@ -8,7 +8,7 @@ Broadleaf Commerce currently offers integration with Authorize.net using the fol
 
 > Note: As per the Authorize.net docs on AIM, transactions submitted to the test environment using a developer test account are not submitted to financial institutions for authorization and are not stored in the Merchant Interface.
 
-For instruction on how to integrate this module into your Broadleaf project, please follow our integration guide here: http://docs.broadleafcommerce.org/current/Authorize.net-Module.html
+For instruction on how to integrate this module into your Broadleaf project, please follow our integration guide here: http://www.broadleafcommerce.com/docs/authorizenet/current/
 
 Authorize.net Links and Resources:
 
