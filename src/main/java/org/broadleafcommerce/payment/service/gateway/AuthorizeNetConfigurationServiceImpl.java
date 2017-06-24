@@ -4,23 +4,20 @@
  * %%
  * Copyright (C) 2009 - 2014 Broadleaf Commerce
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Broadleaf Fair Use License Agreement, Version 1.0
+ * (the "Fair Use License" located  at http://license.broadleafcommerce.org/fair_use_license-1.0.txt)
+ * unless the restrictions on use therein are violated and require payment to Broadleaf in which case
+ * the Broadleaf End User License Agreement (EULA), Version 1.1
+ * (the "Commercial License" located at http://license.broadleafcommerce.org/commercial_license-1.1.txt)
+ * shall apply.
  * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Alternatively, the Commercial License may be replaced with a mutually agreed upon license (the "Custom License")
+ * between you and Broadleaf Commerce. You may not use this file except in compliance with the applicable license.
  * #L%
  */
 package org.broadleafcommerce.payment.service.gateway;
 
-import javax.annotation.Resource;
-
+import org.broadleafcommerce.common.payment.service.AbstractPaymentGatewayConfigurationService;
 import org.broadleafcommerce.common.payment.service.PaymentGatewayConfiguration;
 import org.broadleafcommerce.common.payment.service.PaymentGatewayConfigurationService;
 import org.broadleafcommerce.common.payment.service.PaymentGatewayCreditCardService;
@@ -39,11 +36,13 @@ import org.broadleafcommerce.common.web.payment.processor.CreditCardTypesExtensi
 import org.broadleafcommerce.common.web.payment.processor.TRCreditCardExtensionHandler;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 /**
  * @author Chad Harchar (charchar)
  */
 @Service("blAuthorizeNetConfigurationService")
-public class AuthorizeNetConfigurationServiceImpl implements PaymentGatewayConfigurationService {
+public class AuthorizeNetConfigurationServiceImpl extends AbstractPaymentGatewayConfigurationService implements PaymentGatewayConfigurationService {
 
     @Resource(name = "blAuthorizeNetConfiguration")
     protected AuthorizeNetConfiguration configuration;
@@ -66,64 +65,47 @@ public class AuthorizeNetConfigurationServiceImpl implements PaymentGatewayConfi
     @Resource(name = "blAuthorizeNetFieldExtensionHandler")
     protected PaymentGatewayFieldExtensionHandler fieldExtensionHandler;
 
+    @Resource(name = "blAuthorizeNetTransactionConfirmationService")
+    protected PaymentGatewayTransactionConfirmationService confirmationService;
+
+    @Override
     public PaymentGatewayConfiguration getConfiguration() {
         return configuration;
     }
 
+    @Override
     public PaymentGatewayTransactionService getTransactionService() {
         return transactionService;
     }
 
+    @Override
     public PaymentGatewayTransactionConfirmationService getTransactionConfirmationService() {
-        return null;
+        return confirmationService;
     }
 
-    public PaymentGatewayReportingService getReportingService() {
-        return null;
-    }
-
-    public PaymentGatewayCreditCardService getCreditCardService() {
-        return null;
-    }
-
-    public PaymentGatewayCustomerService getCustomerService() {
-        return null;
-    }
-
-    public PaymentGatewaySubscriptionService getSubscriptionService() {
-        return null;
-    }
-
-    public PaymentGatewayFraudService getFraudService() {
-        return null;
-    }
-
-    public PaymentGatewayHostedService getHostedService() {
-        return null;
-    }
-
+    @Override
     public PaymentGatewayRollbackService getRollbackService() {
         return rollbackService;
     }
 
+    @Override
     public PaymentGatewayWebResponseService getWebResponseService() {
         return webResponseService;
     }
 
+    @Override
     public PaymentGatewayTransparentRedirectService getTransparentRedirectService() {
         return transparentRedirectService;
     }
 
+    @Override
     public TRCreditCardExtensionHandler getCreditCardExtensionHandler() {
         return creditCardExtensionHandler;
     }
 
+    @Override
     public PaymentGatewayFieldExtensionHandler getFieldExtensionHandler() {
         return fieldExtensionHandler;
-    }
-
-    public CreditCardTypesExtensionHandler getCreditCardTypesExtensionHandler() {
-        return null;
     }
 
 }

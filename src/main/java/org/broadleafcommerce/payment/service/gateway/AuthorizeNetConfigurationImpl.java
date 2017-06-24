@@ -4,31 +4,40 @@
  * %%
  * Copyright (C) 2009 - 2014 Broadleaf Commerce
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Broadleaf Fair Use License Agreement, Version 1.0
+ * (the "Fair Use License" located  at http://license.broadleafcommerce.org/fair_use_license-1.0.txt)
+ * unless the restrictions on use therein are violated and require payment to Broadleaf in which case
+ * the Broadleaf End User License Agreement (EULA), Version 1.1
+ * (the "Commercial License" located at http://license.broadleafcommerce.org/commercial_license-1.1.txt)
+ * shall apply.
  * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Alternatively, the Commercial License may be replaced with a mutually agreed upon license (the "Custom License")
+ * between you and Broadleaf Commerce. You may not use this file except in compliance with the applicable license.
  * #L%
  */
 package org.broadleafcommerce.payment.service.gateway;
 
 import org.broadleafcommerce.common.payment.PaymentGatewayType;
+import org.broadleafcommerce.common.payment.service.AbstractPaymentGatewayConfiguration;
 import org.broadleafcommerce.common.util.BLCSystemProperty;
+import org.broadleafcommerce.common.web.BaseUrlResolver;
 import org.broadleafcommerce.vendor.authorizenet.service.payment.AuthorizeNetGatewayType;
 import org.springframework.stereotype.Service;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import javax.annotation.Resource;
+
 
 /**
  * @author Chad Harchar (charchar)
  */
 @Service("blAuthorizeNetConfiguration")
-public class AuthorizeNetConfigurationImpl implements AuthorizeNetConfiguration {
+public class AuthorizeNetConfigurationImpl extends AbstractPaymentGatewayConfiguration implements AuthorizeNetConfiguration {
+
+    @Resource(name = "blBaseUrlResolver")
+    protected BaseUrlResolver urlResolver;
 
     protected int failureReportingThreshold = 1;
 
@@ -37,6 +46,11 @@ public class AuthorizeNetConfigurationImpl implements AuthorizeNetConfiguration 
     @Override
     public String getLoginId() {
         return BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.loginId");
+    }
+
+    @Override
+    public String getClientKey() {
+        return BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.clientKey");
     }
 
     @Override
@@ -56,22 +70,62 @@ public class AuthorizeNetConfigurationImpl implements AuthorizeNetConfiguration 
 
     @Override
     public String getResponseUrl() {
-        return BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.responseUrl");
+        String url = BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.responseUrl");
+        try {
+            URI u = new URI(url);
+            if (u.isAbsolute()) {
+                return url;
+            } else {
+                String baseUrl = urlResolver.getSiteBaseUrl();
+                return baseUrl + url;
+            }
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("The value for 'gateway.authorizenet.responseUrl' is not valid.", e);
+        }
     }
 
     @Override
     public String getConfirmUrl() {
-        return BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.confirmUrl");
+        String url = BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.confirmUrl");
+        try {
+            URI u = new URI(url);
+            if (u.isAbsolute()) {
+                return url;
+            } else {
+                String baseUrl = urlResolver.getSiteBaseUrl();
+                return baseUrl + url;
+            }
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("The value for 'gateway.authorizenet.confirmUrl' is not valid.", e);
+        }
     }
 
     @Override
     public String getErrorUrl() {
-        return BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.errorUrl");
+        String url = BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.errorUrl");
+        try {
+            URI u = new URI(url);
+            if (u.isAbsolute()) {
+                return url;
+            } else {
+                String baseUrl = urlResolver.getSiteBaseUrl();
+                return baseUrl + url;
+            }
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("The value for 'gateway.authorizenet.errorUrl' is not valid.", e);
+        }
     }
 
     @Override
     public String getServerUrl() {
         return BLCSystemProperty.resolveSystemProperty("gateway.authorizenet.serverUrl");
+    }
+    
+    @Override
+    public String getXMLBaseUrl() {
+        return getServerUrl().replace("/gateway/transact.dll", "")
+                .replace("test", "apitest")
+                .replace("secure", "api");
     }
 
     @Override
@@ -159,4 +213,9 @@ public class AuthorizeNetConfigurationImpl implements AuthorizeNetConfiguration 
         return AuthorizeNetGatewayType.AUTHORIZENET;
     }
 
+    @Override
+    public Boolean isSandbox() {
+        return BLCSystemProperty.resolveBooleanSystemProperty("gateway.authorizenet.sandbox", true);
+    }
+    
 }

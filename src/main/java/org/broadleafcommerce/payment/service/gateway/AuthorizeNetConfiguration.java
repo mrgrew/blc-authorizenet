@@ -4,17 +4,15 @@
  * %%
  * Copyright (C) 2009 - 2014 Broadleaf Commerce
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Broadleaf Fair Use License Agreement, Version 1.0
+ * (the "Fair Use License" located  at http://license.broadleafcommerce.org/fair_use_license-1.0.txt)
+ * unless the restrictions on use therein are violated and require payment to Broadleaf in which case
+ * the Broadleaf End User License Agreement (EULA), Version 1.1
+ * (the "Commercial License" located at http://license.broadleafcommerce.org/commercial_license-1.1.txt)
+ * shall apply.
  * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Alternatively, the Commercial License may be replaced with a mutually agreed upon license (the "Custom License")
+ * between you and Broadleaf Commerce. You may not use this file except in compliance with the applicable license.
  * #L%
  */
 package org.broadleafcommerce.payment.service.gateway;
@@ -33,6 +31,13 @@ public interface AuthorizeNetConfiguration extends PaymentGatewayConfiguration {
     * @return String
     */
     public String getLoginId();
+
+    /**
+     * This is the generated client key, provided by the
+     * Merchant Interface that is used in an Accept.js implementation
+     * @return
+     */
+    public String getClientKey();
 
     /**
     * This is the transaction fingerprint, provided by the
@@ -65,6 +70,7 @@ public interface AuthorizeNetConfiguration extends PaymentGatewayConfiguration {
     *
     * @return String
     */
+    @Deprecated
     public String getResponseUrl();
 
     /**
@@ -74,6 +80,7 @@ public interface AuthorizeNetConfiguration extends PaymentGatewayConfiguration {
     *
     * @return String
     */
+    @Deprecated
     public String getConfirmUrl();
 
     /**
@@ -83,6 +90,7 @@ public interface AuthorizeNetConfiguration extends PaymentGatewayConfiguration {
     *
     * @return String
     */
+    @Deprecated
     public String getErrorUrl();
 
     /**
@@ -104,6 +112,14 @@ public interface AuthorizeNetConfiguration extends PaymentGatewayConfiguration {
      * @return String
      */
     public String getServerUrl();
+    
+    /**
+     * Slightly different than {@link #getServerUrl()} in that this is used to communicate with the XML APIs. This does not
+     * have the /gateway/transact.dll on the end of it and serves as a convenience method for whatever is in {@link #getServerUrl()}
+     * 
+     * @return
+     */
+    public String getXMLBaseUrl();
 
     /**
     * This value should only be true when testing in a live environment, e.g. staging.
@@ -111,5 +127,7 @@ public interface AuthorizeNetConfiguration extends PaymentGatewayConfiguration {
     * @return String
     */
     public String getXTestRequest();
+    
+    public Boolean isSandbox();
 
 }

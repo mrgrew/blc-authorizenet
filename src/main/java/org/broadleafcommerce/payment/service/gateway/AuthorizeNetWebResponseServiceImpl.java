@@ -4,20 +4,31 @@
  * %%
  * Copyright (C) 2009 - 2014 Broadleaf Commerce
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Broadleaf Fair Use License Agreement, Version 1.0
+ * (the "Fair Use License" located  at http://license.broadleafcommerce.org/fair_use_license-1.0.txt)
+ * unless the restrictions on use therein are violated and require payment to Broadleaf in which case
+ * the Broadleaf End User License Agreement (EULA), Version 1.1
+ * (the "Commercial License" located at http://license.broadleafcommerce.org/commercial_license-1.1.txt)
+ * shall apply.
  * 
- *       http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Alternatively, the Commercial License may be replaced with a mutually agreed upon license (the "Custom License")
+ * between you and Broadleaf Commerce. You may not use this file except in compliance with the applicable license.
  * #L%
  */
 package org.broadleafcommerce.payment.service.gateway;
+
+import org.broadleafcommerce.common.money.Money;
+import org.broadleafcommerce.common.payment.PaymentTransactionType;
+import org.broadleafcommerce.common.payment.PaymentType;
+import org.broadleafcommerce.common.payment.dto.PaymentResponseDTO;
+import org.broadleafcommerce.common.payment.service.AbstractPaymentGatewayWebResponseService;
+import org.broadleafcommerce.common.payment.service.PaymentGatewayWebResponsePrintService;
+import org.broadleafcommerce.common.payment.service.PaymentGatewayWebResponseService;
+import org.broadleafcommerce.common.vendor.service.exception.PaymentException;
+import org.broadleafcommerce.vendor.authorizenet.service.payment.AuthorizeNetCheckoutService;
+import org.broadleafcommerce.vendor.authorizenet.service.payment.AuthorizeNetGatewayType;
+import org.broadleafcommerce.vendor.authorizenet.service.payment.type.MessageConstants;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
@@ -26,28 +37,21 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.authorize.AuthNetField;
 
-import org.broadleafcommerce.common.money.Money;
-import org.broadleafcommerce.common.payment.PaymentTransactionType;
-import org.broadleafcommerce.common.payment.PaymentType;
-import org.broadleafcommerce.common.payment.dto.PaymentResponseDTO;
-import org.broadleafcommerce.common.payment.service.PaymentGatewayWebResponsePrintService;
-import org.broadleafcommerce.common.payment.service.PaymentGatewayWebResponseService;
-import org.broadleafcommerce.common.vendor.service.exception.PaymentException;
-import org.broadleafcommerce.vendor.authorizenet.service.payment.AuthorizeNetGatewayType;
-import org.broadleafcommerce.vendor.authorizenet.service.payment.type.MessageConstants;
-import org.springframework.stereotype.Service;
-
 /**
  * @author Chad Harchar (charchar)
  */
+@Deprecated
 @Service("blAuthorizeNetWebResponseService")
-public class AuthorizeNetWebResponseServiceImpl implements PaymentGatewayWebResponseService {
+public class AuthorizeNetWebResponseServiceImpl extends AbstractPaymentGatewayWebResponseService implements PaymentGatewayWebResponseService {
 
     @Resource(name = "blAuthorizeNetConfiguration")
     protected AuthorizeNetConfiguration configuration;
     
     @Resource(name = "blPaymentGatewayWebResponsePrintService")
     protected PaymentGatewayWebResponsePrintService webResponsePrintService;
+    
+    @Resource(name = "blAuthorizeNetCheckoutService")
+    protected AuthorizeNetCheckoutService authorizeNetCheckoutService;
 
     @Override
     public PaymentResponseDTO translateWebResponse(HttpServletRequest request) throws PaymentException {
@@ -77,6 +81,12 @@ public class AuthorizeNetWebResponseServiceImpl implements PaymentGatewayWebResp
         if (!configuration.isPerformAuthorizeAndCapture()) {
             type = PaymentTransactionType.AUTHORIZE;
         }
+
+        // Validate this is a real request from Authorize.net
+        String customerId = responseDTO.getResponseMap().get(MessageConstants.BLC_CID);
+        String orderId = responseDTO.getResponseMap().get(MessageConstants.BLC_OID);
+        String tps = responseDTO.getResponseMap().get(MessageConstants.BLC_TPS);
+        responseDTO.valid(authorizeNetCheckoutService.verifyTamperProofSeal(customerId, orderId, tps));
 
         responseDTO.successful(approved)
         .amount(amount)
